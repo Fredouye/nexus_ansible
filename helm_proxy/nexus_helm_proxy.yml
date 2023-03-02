@@ -1,0 +1,22 @@
+---
+
+- hosts: localhost
+  connection: local
+  become: false
+  gather_facts: false
+  vars:
+    nexus_url: https://nexus.foo.com
+    nexus_username: admin
+    nexus_password: xxxxxx
+    nexus_blobstore: my_repos
+    helm_repositories:
+      - name: bitnami
+        url: https://charts.bitnami.com/bitnami
+      - name: antrea
+        url: https://charts.antrea.io
+      - name: argo
+        url: https://argoproj.github.io/argo-helm
+      - name: gitlab
+        url: https://charts.gitlab.io
+  roles:
+    - nexus_helm_proxy

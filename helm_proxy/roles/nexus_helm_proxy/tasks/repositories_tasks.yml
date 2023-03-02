@@ -1,0 +1,33 @@
+- name: Check if {{ item.url }} proxy repository is present
+  ansible.builtin.set_fact:
+    repo: '{{ repositories.json | community.general.json_query(my_query) }}'
+  vars:
+    my_query: "[? name=='{{ item.name }}-proxy']"
+
+- name: Add {{ item.url }} proxy repository
+  ansible.builtin.uri:
+    url: https://nexus.fredouye.fr/service/rest/v1/repositories/helm/proxy
+    method: POST
+    force_basic_auth: true
+    user: '{{ nexus_username }}'
+    password: '{{ nexus_password }}'
+    body_format: json
+    body:
+      name: '{{ item.name }}-proxy'
+      online: true
+      proxy:
+        remoteUrl: '{{ item.url }}'
+        contentMaxAge: 1440
+        metadataMaxAge: 1440
+      storage:
+        blobStoreName: '{{ nexus_blobstore }}'
+        strictContentTypeValidation: true
+      negativeCache:
+        enabled: true
+        timeToLive: 1440
+      httpClient:
+        blocked: false
+        autoBlock: true
+    status_code: 201
+  changed_when: true
+  when: repo | length == 0

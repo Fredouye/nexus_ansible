@@ -1,0 +1,9 @@
+- name: Get a list of repositories
+  ansible.builtin.uri:
+    url: "{{ nexus_url }}/service/rest/v1/repositories"
+  register: repositories
+
+- name: Include tasks file
+  ansible.builtin.include_tasks: repositories_tasks.yml
+  loop: "{{ helm_repositories }}"
+  no_log: true
